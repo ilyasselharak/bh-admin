@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "../../auth/[...nextauth]/auth.config";
 import Course from "../../../../models/Course";
 
 // Import all course models
@@ -54,8 +54,8 @@ const getModel = (level: string, grade: string) => {
 
 // GET /api/courses/[id]
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -64,7 +64,7 @@ export async function GET(
     }
 
     await connectDB();
-    const course = await Course.findById(params.id);
+    const course = await Course.findById(context.params.id);
 
     if (!course) {
       return NextResponse.json(
@@ -85,8 +85,8 @@ export async function GET(
 
 // PUT /api/courses/[id]
 export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -94,7 +94,7 @@ export async function PUT(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
+    const body = await request.json();
     const { title, description } = body;
 
     if (!title || !description) {
@@ -106,7 +106,7 @@ export async function PUT(
 
     await connectDB();
     const course = await Course.findByIdAndUpdate(
-      params.id,
+      context.params.id,
       { title, description },
       { new: true, runValidators: true }
     );
@@ -130,8 +130,8 @@ export async function PUT(
 
 // DELETE /api/courses/[id]
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -140,7 +140,7 @@ export async function DELETE(
     }
 
     await connectDB();
-    const course = await Course.findByIdAndDelete(params.id);
+    const course = await Course.findByIdAndDelete(context.params.id);
 
     if (!course) {
       return NextResponse.json(
@@ -160,8 +160,8 @@ export async function DELETE(
 }
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -169,8 +169,8 @@ export async function PATCH(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
-    const { courseLink, exerciseLink } = await req.json();
+    const { id } = context.params;
+    const { courseLink, exerciseLink } = await request.json();
 
     await connectDB();
 
