@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/auth.config";
@@ -53,10 +53,9 @@ const getModel = (level: string, grade: string) => {
 };
 
 // GET /api/courses/[id]
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function GET(request: NextRequest, context: any) {
+  const { params } = context;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -84,10 +83,9 @@ export async function GET(
 }
 
 // PUT /api/courses/[id]
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function PUT(request: Request, context: any) {
+  const { params } = context;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -129,10 +127,9 @@ export async function PUT(
 }
 
 // DELETE /api/courses/[id]
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function DELETE(request: Request, context: any) {
+  const { params } = context;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -159,10 +156,9 @@ export async function DELETE(
   }
 }
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function PATCH(request: Request, context: any) {
+  const { params } = context;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
