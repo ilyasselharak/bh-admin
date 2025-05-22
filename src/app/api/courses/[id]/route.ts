@@ -55,7 +55,7 @@ const getModel = (level: string, grade: string) => {
 // GET /api/courses/[id]
 export async function GET(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -64,7 +64,7 @@ export async function GET(
     }
 
     await connectDB();
-    const course = await Course.findById(context.params.id);
+    const course = await Course.findById(params.id);
 
     if (!course) {
       return NextResponse.json(
@@ -86,7 +86,7 @@ export async function GET(
 // PUT /api/courses/[id]
 export async function PUT(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -106,7 +106,7 @@ export async function PUT(
 
     await connectDB();
     const course = await Course.findByIdAndUpdate(
-      context.params.id,
+      params.id,
       { title, description },
       { new: true, runValidators: true }
     );
@@ -131,7 +131,7 @@ export async function PUT(
 // DELETE /api/courses/[id]
 export async function DELETE(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -140,7 +140,7 @@ export async function DELETE(
     }
 
     await connectDB();
-    const course = await Course.findByIdAndDelete(context.params.id);
+    const course = await Course.findByIdAndDelete(params.id);
 
     if (!course) {
       return NextResponse.json(
@@ -161,7 +161,7 @@ export async function DELETE(
 
 export async function PATCH(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -169,7 +169,7 @@ export async function PATCH(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = context.params;
+    const { id } = params;
     const { courseLink, exerciseLink } = await request.json();
 
     await connectDB();
