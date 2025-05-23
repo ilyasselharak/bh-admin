@@ -1,19 +1,73 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import Course from "../../../models/Course";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/auth.config";
 
+// Import all course models
+import FirstCollegeCourse from "@/models/FirstCollegeCourse";
+import SecondCollegeCourse from "@/models/SecondCollegeCourse";
+import ThirdCollegeCourse from "@/models/ThirdCollegeCourse";
+import FirstBacMathCourse from "@/models/FirstBacMathCourse";
+import FirstBacScienceCourse from "@/models/FirstBacScienceCourse";
+import FirstBacEconomicsCourse from "@/models/FirstBacEconomicsCourse";
+import FirstBacLettersCourse from "@/models/FirstBacLettersCourse";
+import SecondBacMathACourse from "@/models/SecondBacMathACourse";
+import SecondBacMathBCourse from "@/models/SecondBacMathBCourse";
+import CommonCoreCourse from "@/models/CommonCoreCourse";
+import CommonCoreLettersCourse from "@/models/CommonCoreLettersCourse";
+import CommonCoreScienceCourse from "@/models/CommonCoreScienceCourse";
+import CommonCoreTechnicalCourse from "@/models/CommonCoreTechnicalCourse";
+
+// Helper function to get the correct model based on model name
+const getModel = (modelName: string) => {
+  const models = {
+    FirstCollegeCourse,
+    SecondCollegeCourse,
+    ThirdCollegeCourse,
+    FirstBacMathCourse,
+    FirstBacScienceCourse,
+    FirstBacEconomicsCourse,
+    FirstBacLettersCourse,
+    SecondBacMathACourse,
+    SecondBacMathBCourse,
+    CommonCoreCourse,
+    CommonCoreLettersCourse,
+    CommonCoreScienceCourse,
+    CommonCoreTechnicalCourse,
+  };
+
+  return models[modelName as keyof typeof models] || null;
+};
+
 // GET /api/courses
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const modelName = searchParams.get("model");
+
+    if (!modelName) {
+      return NextResponse.json(
+        { message: "Model parameter is required" },
+        { status: 400 }
+      );
+    }
+
     await connectDB();
-    const courses = await Course.find().sort({ createdAt: -1 });
+
+    const Model = getModel(modelName);
+    if (!Model) {
+      return NextResponse.json(
+        { message: "Invalid model specified" },
+        { status: 400 }
+      );
+    }
+
+    const courses = await Model.find().sort({ createdAt: -1 });
     return NextResponse.json(courses);
   } catch (error) {
     console.error("Error fetching courses:", error);
@@ -25,30 +79,48 @@ export async function GET() {
 }
 
 // POST /api/courses
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { title, description } = body;
+    const body = await request.json();
+    const {
+      model: modelName,
+      name,
+      courseLink,
+      exerciseLink,
+      devoirLink,
+      examenLink,
+    } = body;
 
-    if (!title || !description) {
+    if (!modelName || !name) {
       return NextResponse.json(
-        { message: "Title and description are required" },
+        { message: "Model and name are required" },
         { status: 400 }
       );
     }
 
     await connectDB();
-    const course = new Course({
-      title,
-      description,
+
+    const Model = getModel(modelName);
+    if (!Model) {
+      return NextResponse.json(
+        { message: "Invalid model specified" },
+        { status: 400 }
+      );
+    }
+
+    const course = await Model.create({
+      name,
+      courseLink,
+      exerciseLink,
+      devoirLink,
+      examenLink,
     });
 
-    await course.save();
     return NextResponse.json(course, { status: 201 });
   } catch (error) {
     console.error("Error creating course:", error);
