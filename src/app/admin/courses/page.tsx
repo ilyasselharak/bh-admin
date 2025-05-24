@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Editor } from "@tinymce/tinymce-react";
 
 interface Course {
   _id: string;
@@ -14,7 +15,19 @@ interface Course {
   createdAt: string;
   updatedAt: string;
 }
+interface MediaData {
+  url: string;
+  type?: string;
+}
 
+interface MediaResolver {
+  html: string;
+}
+
+interface BlobInfo {
+  blob: () => Blob;
+  filename: () => string;
+}
 export default function CoursesPage() {
   const { status } = useSession();
   const router = useRouter();
@@ -25,6 +38,76 @@ export default function CoursesPage() {
     level: "",
     grade: "",
   });
+  const editorConfig = {
+    height: 500,
+    plugins: [
+      "advlist",
+      "autolink",
+      "lists",
+      "link",
+      "image",
+      "media",
+      "charmap",
+      "anchor",
+      "searchreplace",
+      "visualblocks",
+      "code",
+      "fullscreen",
+      "insertdatetime",
+      "table",
+      "preview",
+      "help",
+      "wordcount",
+    ],
+    toolbar:
+      "undo redo | blocks | " +
+      "bold italic forecolor | alignleft aligncenter " +
+      "alignright alignjustify | bullist numlist outdent indent | " +
+      "image media | removeformat | help",
+    content_style:
+      "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+    images_upload_url: "/api/upload",
+    images_upload_handler: async (blobInfo: BlobInfo) => {
+      try {
+        const formData = new FormData();
+        formData.append("file", blobInfo.blob(), blobInfo.filename());
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const data = await response.json();
+        return data.url;
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        throw new Error("Failed to upload file");
+      }
+    },
+    automatic_uploads: true,
+    file_picker_types: "image media file",
+    images_reuse_filename: true,
+    images_upload_base_path: "/uploads",
+    media_live_embeds: true,
+    media_url_resolver: function (
+      data: MediaData,
+      resolve: (result: MediaResolver) => void
+    ) {
+      if (data.url.toLowerCase().includes("drive.google")) {
+        resolve({
+          html: `<iframe src="${data.url}" width="100%" height="500px" style="border: none;"></iframe>`,
+        });
+      } else {
+        resolve({
+          html: `<video controls width="100%"><source src="${data.url}" type="video/mp4"></video>`,
+        });
+      }
+    },
+  };
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [editedUrls, setEditedUrls] = useState("");
@@ -277,12 +360,20 @@ export default function CoursesPage() {
               <p className="text-sm text-gray-600 mb-4">
                 Enter URLs separated by &quot;,,&quot; (double comma)
               </p>
-              <textarea
+              {/* <textarea
                 value={editedUrls}
                 onChange={(e) => setEditedUrls(e.target.value)}
                 className="w-full h-48 p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-none text-black"
                 placeholder="Enter URLs separated by ,,"
-              />
+              /> */}
+              <Editor
+            tinymceScriptSrc="/tinymce/tinymce.min.js"
+            value={editedUrls}
+            onEditorChange={(newValue) => {
+              setEditedUrls(newValue)
+            }}
+            init={editorConfig}
+          />
               <div className="flex justify-end gap-3 mt-4">
                 <button
                   onClick={() => setIsModalOpen(false)}

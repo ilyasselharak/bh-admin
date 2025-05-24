@@ -11,6 +11,11 @@ interface MediaResolver {
   html: string;
 }
 
+interface BlobInfo {
+  blob: () => Blob;
+  filename: () => string;
+}
+
 function EditorCom() {
   const [isClient, setIsClient] = useState(false);
   const [course, setCourse] = useState("");
@@ -20,8 +25,79 @@ function EditorCom() {
   const [selectedModel, setSelectedModel] = useState("");
   const [courseName, setCourseName] = useState("");
   const [message, setMessage] = useState({ type: "", text: "" });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const editorConfig = {
+    height: 500,
+    plugins: [
+      "advlist",
+      "autolink",
+      "lists",
+      "link",
+      "image",
+      "media",
+      "charmap",
+      "anchor",
+      "searchreplace",
+      "visualblocks",
+      "code",
+      "fullscreen",
+      "insertdatetime",
+      "table",
+      "preview",
+      "help",
+      "wordcount",
+    ],
+    toolbar:
+      "undo redo | blocks | " +
+      "bold italic forecolor | alignleft aligncenter " +
+      "alignright alignjustify | bullist numlist outdent indent | " +
+      "image media | removeformat | help",
+    content_style:
+      "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+    images_upload_url: "/api/upload",
+    images_upload_handler: async (blobInfo: BlobInfo) => {
+      try {
+        const formData = new FormData();
+        formData.append("file", blobInfo.blob(), blobInfo.filename());
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const data = await response.json();
+        return data.url;
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        throw new Error("Failed to upload file");
+      }
+    },
+    automatic_uploads: true,
+    file_picker_types: "image media file",
+    images_reuse_filename: true,
+    images_upload_base_path: "/uploads",
+    media_live_embeds: true,
+    media_url_resolver: function (
+      data: MediaData,
+      resolve: (result: MediaResolver) => void
+    ) {
+      if (data.url.toLowerCase().includes("drive.google")) {
+        resolve({
+          html: `<iframe src="${data.url}" width="100%" height="500px" style="border: none;"></iframe>`,
+        });
+      } else {
+        resolve({
+          html: `<video controls width="100%"><source src="${data.url}" type="video/mp4"></video>`,
+        });
+      }
+    },
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -49,6 +125,10 @@ function EditorCom() {
         setMessage({ type: "success", text: "Course added successfully!" });
         // Reset form
         setCourseName("");
+        setCourse("");
+        setExercice("");
+        setDevoir("");
+        setExamen("");
       } else {
         setMessage({
           type: "error",
@@ -65,6 +145,7 @@ function EditorCom() {
       setIsSubmitting(false);
     }
   };
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -123,296 +204,62 @@ function EditorCom() {
           />
         </div>
 
-        <Editor
-          tinymceScriptSrc="/tinymce/tinymce.min.js"
-          value={course}
-          onEditorChange={(newValue) => {
-            setCourse(newValue);
-          }}
-          init={{
-            height: 500,
-            plugins: [
-              "advlist",
-              "autolink",
-              "lists",
-              "link",
-              "image",
-              "media",
-              "charmap",
-              "anchor",
-              "searchreplace",
-              "visualblocks",
-              "code",
-              "fullscreen",
-              "insertdatetime",
-              "table",
-              "preview",
-              "help",
-              "wordcount",
-            ],
-            toolbar:
-              "undo redo | blocks | " +
-              "bold italic forecolor | alignleft aligncenter " +
-              "alignright alignjustify | bullist numlist outdent indent | " +
-              "image media | removeformat | help",
-            content_style:
-              "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-            images_upload_url: "/api/upload",
-            images_upload_handler: async (blobInfo) => {
-              try {
-                const formData = new FormData();
-                formData.append("file", blobInfo.blob(), blobInfo.filename());
-
-                const response = await fetch("/api/upload", {
-                  method: "POST",
-                  body: formData,
-                });
-
-                if (!response.ok) {
-                  throw new Error("Upload failed");
-                }
-
-                const data = await response.json();
-                return data.url;
-              } catch (error) {
-                console.error("Error uploading file:", error);
-                throw new Error("Failed to upload file");
-              }
-            },
-            automatic_uploads: true,
-            file_picker_types: "image media",
-            images_reuse_filename: true,
-            images_upload_base_path: "/uploads",
-            media_live_embeds: true,
-            media_url_resolver: function (
-              data: MediaData,
-              resolve: (result: MediaResolver) => void
-            ) {
-              resolve({
-                html: `<video controls width="100%"><source src="${data.url}" type="video/mp4"></video>`,
-              });
-            },
-          }}
-        />
-        <Editor
-          tinymceScriptSrc="/tinymce/tinymce.min.js"
-          value={exercice}
-          onEditorChange={(newValue) => {
-            setExercice(newValue);
-          }}
-          init={{
-            height: 500,
-            plugins: [
-              "advlist",
-              "autolink",
-              "lists",
-              "link",
-              "image",
-              "media",
-              "charmap",
-              "anchor",
-              "searchreplace",
-              "visualblocks",
-              "code",
-              "fullscreen",
-              "insertdatetime",
-              "table",
-              "preview",
-              "help",
-              "wordcount",
-            ],
-            toolbar:
-              "undo redo | blocks | " +
-              "bold italic forecolor | alignleft aligncenter " +
-              "alignright alignjustify | bullist numlist outdent indent | " +
-              "image media | removeformat | help",
-            content_style:
-              "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-            images_upload_url: "/api/upload",
-            images_upload_handler: async (blobInfo) => {
-              try {
-                const formData = new FormData();
-                formData.append("file", blobInfo.blob(), blobInfo.filename());
-
-                const response = await fetch("/api/upload", {
-                  method: "POST",
-                  body: formData,
-                });
-
-                if (!response.ok) {
-                  throw new Error("Upload failed");
-                }
-
-                const data = await response.json();
-                return data.url;
-              } catch (error) {
-                console.error("Error uploading file:", error);
-                throw new Error("Failed to upload file");
-              }
-            },
-            automatic_uploads: true,
-            file_picker_types: "image media",
-            images_reuse_filename: true,
-            images_upload_base_path: "/uploads",
-            media_live_embeds: true,
-            media_url_resolver: function (
-              data: MediaData,
-              resolve: (result: MediaResolver) => void
-            ) {
-              resolve({
-                html: `<video controls width="100%"><source src="${data.url}" type="video/mp4"></video>`,
-              });
-            },
-          }}
-        />
-        <Editor
-          tinymceScriptSrc="/tinymce/tinymce.min.js"
-          value={devoir}
-          onEditorChange={(newValue) => {
-            setDevoir(newValue);
-          }}
-          init={{
-            height: 500,
-            plugins: [
-              "advlist",
-              "autolink",
-              "lists",
-              "link",
-              "image",
-              "media",
-              "charmap",
-              "anchor",
-              "searchreplace",
-              "visualblocks",
-              "code",
-              "fullscreen",
-              "insertdatetime",
-              "table",
-              "preview",
-              "help",
-              "wordcount",
-            ],
-            toolbar:
-              "undo redo | blocks | " +
-              "bold italic forecolor | alignleft aligncenter " +
-              "alignright alignjustify | bullist numlist outdent indent | " +
-              "image media | removeformat | help",
-            content_style:
-              "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-            images_upload_url: "/api/upload",
-            images_upload_handler: async (blobInfo) => {
-              try {
-                const formData = new FormData();
-                formData.append("file", blobInfo.blob(), blobInfo.filename());
-
-                const response = await fetch("/api/upload", {
-                  method: "POST",
-                  body: formData,
-                });
-
-                if (!response.ok) {
-                  throw new Error("Upload failed");
-                }
-
-                const data = await response.json();
-                return data.url;
-              } catch (error) {
-                console.error("Error uploading file:", error);
-                throw new Error("Failed to upload file");
-              }
-            },
-            automatic_uploads: true,
-            file_picker_types: "image media",
-            images_reuse_filename: true,
-            images_upload_base_path: "/uploads",
-            media_live_embeds: true,
-            media_url_resolver: function (
-              data: MediaData,
-              resolve: (result: MediaResolver) => void
-            ) {
-              resolve({
-                html: `<video controls width="100%"><source src="${data.url}" type="video/mp4"></video>`,
-              });
-            },
-          }}
-        />
-        <Editor
-          tinymceScriptSrc="/tinymce/tinymce.min.js"
-          value={examen}
-          onEditorChange={(newValue) => {
-            setExamen(newValue);
-          }}
-          init={{
-            height: 500,
-            plugins: [
-              "advlist",
-              "autolink",
-              "lists",
-              "link",
-              "image",
-              "media",
-              "charmap",
-              "anchor",
-              "searchreplace",
-              "visualblocks",
-              "code",
-              "fullscreen",
-              "insertdatetime",
-              "table",
-              "preview",
-              "help",
-              "wordcount",
-            ],
-            toolbar:
-              "undo redo | blocks | " +
-              "bold italic forecolor | alignleft aligncenter " +
-              "alignright alignjustify | bullist numlist outdent indent | " +
-              "image media | removeformat | help",
-            content_style:
-              "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-            images_upload_url: "/api/upload",
-            images_upload_handler: async (blobInfo) => {
-              try {
-                const formData = new FormData();
-                formData.append("file", blobInfo.blob(), blobInfo.filename());
-
-                const response = await fetch("/api/upload", {
-                  method: "POST",
-                  body: formData,
-                });
-
-                if (!response.ok) {
-                  throw new Error("Upload failed");
-                }
-
-                const data = await response.json();
-                return data.url;
-              } catch (error) {
-                console.error("Error uploading file:", error);
-                throw new Error("Failed to upload file");
-              }
-            },
-            automatic_uploads: true,
-            file_picker_types: "image media",
-            images_reuse_filename: true,
-            images_upload_base_path: "/uploads",
-            media_live_embeds: true,
-            media_url_resolver: function (
-              data: MediaData,
-              resolve: (result: MediaResolver) => void
-            ) {
-              resolve({
-                html: `<video controls width="100%"><source src="${data.url}" type="video/mp4"></video>`,
-              });
-            },
-          }}
-        />
-        <div className="mt-4 p-4 border rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Preview:</h3>
-          <div dangerouslySetInnerHTML={{ __html: course }} />
-          <div dangerouslySetInnerHTML={{ __html: exercice }} />
-          <div dangerouslySetInnerHTML={{ __html: course }} />
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Course Content
+          </label>
+          <Editor
+            tinymceScriptSrc="/tinymce/tinymce.min.js"
+            value={course}
+            onEditorChange={(newValue) => {
+              setCourse(newValue);
+            }}
+            init={editorConfig}
+          />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Exercises
+          </label>
+          <Editor
+            tinymceScriptSrc="/tinymce/tinymce.min.js"
+            value={exercice}
+            onEditorChange={(newValue) => {
+              setExercice(newValue);
+            }}
+            init={editorConfig}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Homework
+          </label>
+          <Editor
+            tinymceScriptSrc="/tinymce/tinymce.min.js"
+            value={devoir}
+            onEditorChange={(newValue) => {
+              setDevoir(newValue);
+            }}
+            init={editorConfig}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Exams
+          </label>
+          <Editor
+            tinymceScriptSrc="/tinymce/tinymce.min.js"
+            value={examen}
+            onEditorChange={(newValue) => {
+              setExamen(newValue);
+            }}
+            init={editorConfig}
+          />
+        </div>
+
         {message.text && (
           <div
             className={`p-4 rounded-md ${
@@ -424,6 +271,9 @@ function EditorCom() {
             {message.text}
           </div>
         )}
+        <div dangerouslySetInnerHTML={{ __html: course }} />
+        <div dangerouslySetInnerHTML={{ __html: exercice }} />
+        <div dangerouslySetInnerHTML={{ __html: course }} />
         <button
           type="submit"
           disabled={isSubmitting}

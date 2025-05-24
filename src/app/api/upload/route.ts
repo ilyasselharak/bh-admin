@@ -11,6 +11,7 @@ const ALLOWED_IMAGE_TYPES = [
   "image/webp",
 ];
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg"];
+const ALLOWED_PDF_TYPES = ["application/pdf"];
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: NextRequest) {
@@ -39,7 +40,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Check file type
-    if (![...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES].includes(file.type)) {
+    if (
+      ![
+        ...ALLOWED_IMAGE_TYPES,
+        ...ALLOWED_VIDEO_TYPES,
+        ...ALLOWED_PDF_TYPES,
+      ].includes(file.type)
+    ) {
       return NextResponse.json(
         { message: "File type not allowed" },
         { status: 400 }
@@ -54,21 +61,31 @@ export async function POST(request: NextRequest) {
     const filename = `${uniqueSuffix}-${file.name}`;
 
     // Determine the upload directory based on file type
-    const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type);
-    const uploadDir = join(
-      process.cwd(),
-      "public",
-      isVideo ? "uploads/videos" : "uploads/images"
-    );
+    let uploadDir;
+    if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
+      uploadDir = join(process.cwd(), "public", "uploads/videos");
+    } else if (ALLOWED_PDF_TYPES.includes(file.type)) {
+      uploadDir = join(process.cwd(), "public", "uploads/pdfs");
+    } else {
+      uploadDir = join(process.cwd(), "public", "uploads/images");
+    }
+
     const filepath = join(uploadDir, filename);
 
     // Write the file
     await writeFile(filepath, buffer);
 
     // Return the URL of the uploaded file
-    return NextResponse.json({
-      url: `/uploads/${isVideo ? "videos" : "images"}/${filename}`,
-    });
+    let url;
+    if (ALLOWED_VIDEO_TYPES.includes(file.type)) {
+      url = `/uploads/videos/${filename}`;
+    } else if (ALLOWED_PDF_TYPES.includes(file.type)) {
+      url = `/uploads/pdfs/${filename}`;
+    } else {
+      url = `/uploads/images/${filename}`;
+    }
+
+    return NextResponse.json({ url });
   } catch (error) {
     console.error("Error uploading file:", error);
     return NextResponse.json(
