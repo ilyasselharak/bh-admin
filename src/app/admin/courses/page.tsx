@@ -425,10 +425,7 @@ export default function CoursesPage() {
               <h2 className="text-2xl font-bold mb-4 text-indigo-900">
                 Edit Exercise Links - {editingCourse.name}
               </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Enter URLs separated by &quot;,,&quot; (double comma)
-              </p>
-             
+
               <Editor
                 tinymceScriptSrc="/tinymce/tinymce.min.js"
                 value={editedExerciseUrls}

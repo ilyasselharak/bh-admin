@@ -292,6 +292,23 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {/* Devoir Management Card */}
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <h3 className="text-lg font-medium text-gray-900">
+                  Devoir Management
+                </h3>
+                <div className="mt-4">
+                  <button
+                    onClick={() => router.push("/admin/devoirs")}
+                    className="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600"
+                  >
+                    Manage Devoirs
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* User Management Card */}
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="px-4 py-5 sm:p-6">
