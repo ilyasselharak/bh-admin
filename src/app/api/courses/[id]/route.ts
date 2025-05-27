@@ -146,9 +146,34 @@ export async function DELETE(request: Request, context: any) {
     }
 
     await connectDB();
-    const course = await Course.findByIdAndDelete(params.id);
 
-    if (!course) {
+    // Try to delete from all possible collections
+    const collections = [
+      FirstCollegeCourse,
+      SecondCollegeCourse,
+      ThirdCollegeCourse,
+      FirstBacMathCourse,
+      FirstBacScienceCourse,
+      FirstBacEconomicsCourse,
+      FirstBacLettersCourse,
+      SecondBacMathACourse,
+      SecondBacMathBCourse,
+      CommonCoreCourse,
+      CommonCoreLettersCourse,
+      CommonCoreScienceCourse,
+      CommonCoreTechnicalCourse,
+    ];
+
+    let deleted = false;
+    for (const Model of collections) {
+      const result = await Model.findByIdAndDelete(params.id);
+      if (result) {
+        deleted = true;
+        break;
+      }
+    }
+
+    if (!deleted) {
       return NextResponse.json(
         { message: "Course not found" },
         { status: 404 }

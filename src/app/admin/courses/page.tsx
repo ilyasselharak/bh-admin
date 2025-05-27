@@ -225,6 +225,26 @@ export default function CoursesPage() {
     }
   };
 
+  const handleDelete = async (courseId: string) => {
+    if (!confirm("Are you sure you want to delete this course?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/courses/${courseId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete course");
+
+      // Remove the course from the local state
+      setCourses(courses.filter((course) => course._id !== courseId));
+    } catch (err) {
+      setError("Error deleting course");
+      console.error(err);
+    }
+  };
+
   if (status === "loading") {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -337,6 +357,12 @@ export default function CoursesPage() {
                     >
                       Edit Exercise Links
                     </button>
+                    <button
+                      onClick={() => handleDelete(course._id)}
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               </div>
@@ -367,13 +393,13 @@ export default function CoursesPage() {
                 placeholder="Enter URLs separated by ,,"
               /> */}
               <Editor
-            tinymceScriptSrc="/tinymce/tinymce.min.js"
-            value={editedUrls}
-            onEditorChange={(newValue) => {
-              setEditedUrls(newValue)
-            }}
-            init={editorConfig}
-          />
+                tinymceScriptSrc="/tinymce/tinymce.min.js"
+                value={editedUrls}
+                onEditorChange={(newValue) => {
+                  setEditedUrls(newValue);
+                }}
+                init={editorConfig}
+              />
               <div className="flex justify-end gap-3 mt-4">
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -429,4 +455,3 @@ export default function CoursesPage() {
     </div>
   );
 }
- 
