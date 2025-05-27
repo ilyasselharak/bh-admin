@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import CommonCoreLettersDevoir from "@/models/CommonCoreLettersDevoir";
 import CommonCoreScienceDevoir from "@/models/CommonCoreScienceDevoir";
 import CommonCoreTechnicalDevoir from "@/models/CommonCoreTechnicalDevoir";
+import { authOptions } from "../../auth/[...nextauth]/auth.config";
 
 // PATCH /api/devoirs/[id]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function PATCH(request: Request, context: any) {
   try {
     const session = await getServerSession(authOptions);
@@ -71,6 +72,7 @@ export async function PATCH(request: Request, context: any) {
 }
 
 // DELETE /api/devoirs/[id]
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function DELETE(request: Request, context: any) {
   try {
     const session = await getServerSession(authOptions);
