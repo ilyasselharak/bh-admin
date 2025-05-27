@@ -428,11 +428,14 @@ export default function CoursesPage() {
               <p className="text-sm text-gray-600 mb-4">
                 Enter URLs separated by &quot;,,&quot; (double comma)
               </p>
-              <textarea
+             
+              <Editor
+                tinymceScriptSrc="/tinymce/tinymce.min.js"
                 value={editedExerciseUrls}
-                onChange={(e) => setEditedExerciseUrls(e.target.value)}
-                className="w-full h-48 p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-none text-black"
-                placeholder="Enter URLs separated by ,,"
+                onEditorChange={(newValue) => {
+                  setEditedExerciseUrls(newValue);
+                }}
+                init={editorConfig}
               />
               <div className="flex justify-end gap-3 mt-4">
                 <button
