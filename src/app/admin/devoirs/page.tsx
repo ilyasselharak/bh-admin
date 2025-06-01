@@ -75,7 +75,7 @@ export default function DevoirsPage() {
       try {
         setLoading(true);
         const response = await fetch(
-          `/api/devoirs?level=${filters.level}&grade=${filters.grade}&semester=${filters.semester}`
+          `/api/devoirs?type=${filters.grade}&semester=${filters.semester}`
         );
         if (!response.ok) throw new Error("Failed to fetch devoirs");
         const data = await response.json();
@@ -125,8 +125,7 @@ export default function DevoirsPage() {
           title,
           content,
           semester,
-          level: filters.level,
-          grade: filters.grade,
+          type: filters.grade,
         }),
       });
 
@@ -214,20 +213,30 @@ export default function DevoirsPage() {
             <option value="">All Grades</option>
             {filters.level === "college" && (
               <>
-                <option value="1">First College</option>
-                <option value="2">Second College</option>
-                <option value="3">Third College</option>
+                <option value="1college">First College</option>
+                <option value="2college">Second College</option>
+                <option value="3college">Third College</option>
               </>
             )}
             {filters.level === "lycee" && (
               <>
-                <option value="math">Math</option>
-                <option value="science">Science</option>
-                <option value="2bac_math">2Bac Math</option>
-                <option value="2bac_eco">2Bac Economics</option>
-                <option value="2bac_pc">2Bac Physics</option>
-                <option value="2bac_tct">2Bac Technical</option>
-                <option value="tct">Technical</option>
+                <option value="1bac_math">First Bac Math</option>
+                <option value="1bac_science">First Bac Science</option>
+                <option value="1bac_economics">First Bac Economics</option>
+                <option value="1bac_letters">First Bac Letters</option>
+                <option value="2bac_math_a">Second Bac Math A</option>
+                <option value="2bac_math_b">Second Bac Math B</option>
+                <option value="2bac_physics">Second Bac Physics</option>
+                <option value="2bac_economics">Second Bac Economics</option>
+                <option value="2bac_technical">Second Bac Technical</option>
+                <option value="2bac_letters">Second Bac Letters</option>
+                <option value="2bac_pcsvt">
+                  Second Bac Physics Chemistry Life Sciences
+                </option>
+                <option value="2bac_tct">Second Bac Technical Common</option>
+                <option value="letters">Common Core Letters</option>
+                <option value="science">Common Core Science</option>
+                <option value="technical">Common Core Technical</option>
               </>
             )}
           </select>
@@ -359,20 +368,38 @@ export default function DevoirsPage() {
                     <option value="">Select Grade</option>
                     {filters.level === "college" && (
                       <>
-                        <option value="1">First College</option>
-                        <option value="2">Second College</option>
-                        <option value="3">Third College</option>
+                        <option value="1college">First College</option>
+                        <option value="2college">Second College</option>
+                        <option value="3college">Third College</option>
                       </>
                     )}
                     {filters.level === "lycee" && (
                       <>
-                        <option value="math">Math</option>
-                        <option value="science">Science</option>
-                        <option value="2bac_math">2Bac Math</option>
-                        <option value="2bac_eco">2Bac Economics</option>
-                        <option value="2bac_pc">2Bac Physics</option>
-                        <option value="2bac_tct">2Bac Technical</option>
-                        <option value="tct">Technical</option>
+                        <option value="1bac_math">First Bac Math</option>
+                        <option value="1bac_science">First Bac Science</option>
+                        <option value="1bac_economics">
+                          First Bac Economics
+                        </option>
+                        <option value="1bac_letters">First Bac Letters</option>
+                        <option value="2bac_math_a">Second Bac Math A</option>
+                        <option value="2bac_math_b">Second Bac Math B</option>
+                        <option value="2bac_physics">Second Bac Physics</option>
+                        <option value="2bac_economics">
+                          Second Bac Economics
+                        </option>
+                        <option value="2bac_technical">
+                          Second Bac Technical
+                        </option>
+                        <option value="2bac_letters">Second Bac Letters</option>
+                        <option value="2bac_pcsvt">
+                          Second Bac Physics Chemistry Life Sciences
+                        </option>
+                        <option value="2bac_tct">
+                          Second Bac Technical Common
+                        </option>
+                        <option value="letters">Common Core Letters</option>
+                        <option value="science">Common Core Science</option>
+                        <option value="technical">Common Core Technical</option>
                       </>
                     )}
                   </select>

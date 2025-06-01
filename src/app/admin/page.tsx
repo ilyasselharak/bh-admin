@@ -141,6 +141,16 @@ export default function AdminDashboard() {
                     <optgroup label="Second Bac">
                       <option value="SecondBacMathACourse">Math A</option>
                       <option value="SecondBacMathBCourse">Math B</option>
+                      <option value="SecondBacLettersCourse">Letters</option>
+                      <option value="SecondBacPhysicsChemistryLifeSciencesCourse">
+                        Physics Chemistry Life Sciences
+                      </option>
+                      <option value="SecondBacTechnicalCommonCourse">
+                        Technical Common
+                      </option>
+                      <option value="SecondBacEconomicsCourse">
+                        Economics
+                      </option>
                     </optgroup>
                     <optgroup label="Common Core">
                       <option value="CommonCoreCourse">General</option>

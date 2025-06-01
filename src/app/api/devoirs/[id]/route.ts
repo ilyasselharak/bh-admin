@@ -4,7 +4,11 @@ import connectDB from "@/lib/mongodb";
 import CommonCoreLettersDevoir from "@/models/CommonCoreLettersDevoir";
 import CommonCoreScienceDevoir from "@/models/CommonCoreScienceDevoir";
 import CommonCoreTechnicalDevoir from "@/models/CommonCoreTechnicalDevoir";
+import SecondBacPhysicsChemistryLifeSciencesDevoir from "@/models/SecondBacPhysicsChemistryLifeSciencesDevoir";
+import SecondBacTechnicalCommonDevoir from "@/models/SecondBacTechnicalCommonDevoir";
+import SecondBacEconomicsDevoir from "@/models/SecondBacEconomicsDevoir";
 import { authOptions } from "../../auth/[...nextauth]/auth.config";
+import SecondBacLettersDevoir from "@/models/SecondBacLettersDevoir";
 
 // PATCH /api/devoirs/[id]
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,6 +34,7 @@ export async function PATCH(request: Request, context: any) {
 
     let Model;
     switch (type) {
+      // Common Core
       case "letters":
         Model = CommonCoreLettersDevoir;
         break;
@@ -38,6 +43,19 @@ export async function PATCH(request: Request, context: any) {
         break;
       case "technical":
         Model = CommonCoreTechnicalDevoir;
+        break;
+      // Second Bac
+      case "2bac_letters":
+        Model = SecondBacLettersDevoir;
+        break;
+      case "2bac_pcsvt":
+        Model = SecondBacPhysicsChemistryLifeSciencesDevoir;
+        break;
+      case "2bac_tct":
+        Model = SecondBacTechnicalCommonDevoir;
+        break;
+      case "2bac_eco":
+        Model = SecondBacEconomicsDevoir;
         break;
       default:
         return NextResponse.json({ message: "Invalid type" }, { status: 400 });
@@ -88,6 +106,7 @@ export async function DELETE(request: Request, context: any) {
 
     let Model;
     switch (type) {
+      // Common Core
       case "letters":
         Model = CommonCoreLettersDevoir;
         break;
@@ -96,6 +115,19 @@ export async function DELETE(request: Request, context: any) {
         break;
       case "technical":
         Model = CommonCoreTechnicalDevoir;
+        break;
+      // Second Bac
+      case "2bac_letters":
+        Model = SecondBacLettersDevoir;
+        break;
+      case "2bac_pcsvt":
+        Model = SecondBacPhysicsChemistryLifeSciencesDevoir;
+        break;
+      case "2bac_tct":
+        Model = SecondBacTechnicalCommonDevoir;
+        break;
+      case "2bac_eco":
+        Model = SecondBacEconomicsDevoir;
         break;
       default:
         return NextResponse.json({ message: "Invalid type" }, { status: 400 });

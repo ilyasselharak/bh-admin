@@ -14,6 +14,10 @@ import FirstBacEconomicsCourse from "@/models/FirstBacEconomicsCourse";
 import FirstBacLettersCourse from "@/models/FirstBacLettersCourse";
 import SecondBacMathACourse from "@/models/SecondBacMathACourse";
 import SecondBacMathBCourse from "@/models/SecondBacMathBCourse";
+import SecondBacLettersCourse from "@/models/SecondBacLettersCourse";
+import SecondBacPhysicsChemistryLifeSciencesCourse from "@/models/SecondBacPhysicsChemistryLifeSciencesCourse";
+import SecondBacTechnicalCommonCourse from "@/models/SecondBacTechnicalCommonCourse";
+import SecondBacEconomicsCourse from "@/models/SecondBacEconomicsCourse";
 import CommonCoreCourse from "@/models/CommonCoreCourse";
 import CommonCoreLettersCourse from "@/models/CommonCoreLettersCourse";
 import CommonCoreScienceCourse from "@/models/CommonCoreScienceCourse";
@@ -46,6 +50,14 @@ const getModel = (level: string, grade: string) => {
         return SecondBacMathACourse;
       case "2bac_math_b":
         return SecondBacMathBCourse;
+      case "2bac_letters":
+        return SecondBacLettersCourse;
+      case "2bac_pcsvt":
+        return SecondBacPhysicsChemistryLifeSciencesCourse;
+      case "2bac_tct":
+        return SecondBacTechnicalCommonCourse;
+      case "2bac_eco":
+        return SecondBacEconomicsCourse;
       case "common_core":
         return CommonCoreCourse;
       case "common_core_letters":
@@ -158,6 +170,10 @@ export async function DELETE(request: Request, context: any) {
       FirstBacLettersCourse,
       SecondBacMathACourse,
       SecondBacMathBCourse,
+      SecondBacLettersCourse,
+      SecondBacPhysicsChemistryLifeSciencesCourse,
+      SecondBacTechnicalCommonCourse,
+      SecondBacEconomicsCourse,
       CommonCoreCourse,
       CommonCoreLettersCourse,
       CommonCoreScienceCourse,
@@ -233,6 +249,22 @@ export async function PATCH(request: Request, context: any) {
         { model: FirstBacLettersCourse, level: "lycee", grade: "letters" },
         { model: SecondBacMathACourse, level: "lycee", grade: "2bac_math_a" },
         { model: SecondBacMathBCourse, level: "lycee", grade: "2bac_math_b" },
+        {
+          model: SecondBacLettersCourse,
+          level: "lycee",
+          grade: "2bac_letters",
+        },
+        {
+          model: SecondBacPhysicsChemistryLifeSciencesCourse,
+          level: "lycee",
+          grade: "2bac_pcsvt",
+        },
+        {
+          model: SecondBacTechnicalCommonCourse,
+          level: "lycee",
+          grade: "2bac_tct",
+        },
+        { model: SecondBacEconomicsCourse, level: "lycee", grade: "2bac_eco" },
         { model: CommonCoreCourse, level: "lycee", grade: "common_core" },
         {
           model: CommonCoreLettersCourse,

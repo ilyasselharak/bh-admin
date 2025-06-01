@@ -1,10 +1,27 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import connectDB from "@/lib/mongodb";
+import { authOptions } from "../auth/[...nextauth]/auth.config";
+
+// Import all devoir models
+import FirstCollegeDevoir from "@/models/FirstCollegeDevoir";
+import SecondCollegeDevoir from "@/models/SecondCollegeDevoir";
+import ThirdCollegeDevoir from "@/models/ThirdCollegeDevoir";
+import FirstBacMathDevoir from "@/models/FirstBacMathDevoir";
+import FirstBacScienceDevoir from "@/models/FirstBacScienceDevoir";
+import FirstBacEconomicsDevoir from "@/models/FirstBacEconomicsDevoir";
+import FirstBacLettersDevoir from "@/models/FirstBacLettersDevoir";
+import SecondBacMathADevoir from "@/models/SecondBacMathADevoir";
+import SecondBacMathBDevoir from "@/models/SecondBacMathBDevoir";
+import SecondBacPhysicsDevoir from "@/models/SecondBacPhysicsDevoir";
+import SecondBacEconomicsDevoir from "@/models/SecondBacEconomicsDevoir";
+import SecondBacTechnicalDevoir from "@/models/SecondBacTechnicalDevoir";
+import SecondBacLettersDevoir from "@/models/SecondBacLettersDevoir";
+import SecondBacPhysicsChemistryLifeSciencesDevoir from "@/models/SecondBacPhysicsChemistryLifeSciencesDevoir";
+import SecondBacTechnicalCommonDevoir from "@/models/SecondBacTechnicalCommonDevoir";
 import CommonCoreLettersDevoir from "@/models/CommonCoreLettersDevoir";
 import CommonCoreScienceDevoir from "@/models/CommonCoreScienceDevoir";
 import CommonCoreTechnicalDevoir from "@/models/CommonCoreTechnicalDevoir";
-import { authOptions } from "../auth/[...nextauth]/auth.config";
 
 // GET /api/devoirs
 export async function GET(request: Request) {
@@ -22,6 +39,55 @@ export async function GET(request: Request) {
 
     let Model;
     switch (type) {
+      // College
+      case "1college":
+        Model = FirstCollegeDevoir;
+        break;
+      case "2college":
+        Model = SecondCollegeDevoir;
+        break;
+      case "3college":
+        Model = ThirdCollegeDevoir;
+        break;
+      // First Bac
+      case "1bac_math":
+        Model = FirstBacMathDevoir;
+        break;
+      case "1bac_science":
+        Model = FirstBacScienceDevoir;
+        break;
+      case "1bac_economics":
+        Model = FirstBacEconomicsDevoir;
+        break;
+      case "1bac_letters":
+        Model = FirstBacLettersDevoir;
+        break;
+      // Second Bac
+      case "2bac_math_a":
+        Model = SecondBacMathADevoir;
+        break;
+      case "2bac_math_b":
+        Model = SecondBacMathBDevoir;
+        break;
+      case "2bac_physics":
+        Model = SecondBacPhysicsDevoir;
+        break;
+      case "2bac_economics":
+        Model = SecondBacEconomicsDevoir;
+        break;
+      case "2bac_technical":
+        Model = SecondBacTechnicalDevoir;
+        break;
+      case "2bac_letters":
+        Model = SecondBacLettersDevoir;
+        break;
+      case "2bac_pcsvt":
+        Model = SecondBacPhysicsChemistryLifeSciencesDevoir;
+        break;
+      case "2bac_tct":
+        Model = SecondBacTechnicalCommonDevoir;
+        break;
+      // Common Core
       case "letters":
         Model = CommonCoreLettersDevoir;
         break;
@@ -71,6 +137,55 @@ export async function POST(request: Request) {
 
     let Model;
     switch (type) {
+      // College
+      case "1college":
+        Model = FirstCollegeDevoir;
+        break;
+      case "2college":
+        Model = SecondCollegeDevoir;
+        break;
+      case "3college":
+        Model = ThirdCollegeDevoir;
+        break;
+      // First Bac
+      case "1bac_math":
+        Model = FirstBacMathDevoir;
+        break;
+      case "1bac_science":
+        Model = FirstBacScienceDevoir;
+        break;
+      case "1bac_economics":
+        Model = FirstBacEconomicsDevoir;
+        break;
+      case "1bac_letters":
+        Model = FirstBacLettersDevoir;
+        break;
+      // Second Bac
+      case "2bac_math_a":
+        Model = SecondBacMathADevoir;
+        break;
+      case "2bac_math_b":
+        Model = SecondBacMathBDevoir;
+        break;
+      case "2bac_physics":
+        Model = SecondBacPhysicsDevoir;
+        break;
+      case "2bac_economics":
+        Model = SecondBacEconomicsDevoir;
+        break;
+      case "2bac_technical":
+        Model = SecondBacTechnicalDevoir;
+        break;
+      case "2bac_letters":
+        Model = SecondBacLettersDevoir;
+        break;
+      case "2bac_pcsvt":
+        Model = SecondBacPhysicsChemistryLifeSciencesDevoir;
+        break;
+      case "2bac_tct":
+        Model = SecondBacTechnicalCommonDevoir;
+        break;
+      // Common Core
       case "letters":
         Model = CommonCoreLettersDevoir;
         break;
