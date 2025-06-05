@@ -74,14 +74,23 @@ export default function DevoirsPage() {
     const fetchDevoirs = async () => {
       try {
         setLoading(true);
+        if (!filters.grade) {
+          setDevoirs([]);
+          setLoading(false);
+          return;
+        }
+
         const response = await fetch(
           `/api/devoirs?type=${filters.grade}&semester=${filters.semester}`
         );
-        if (!response.ok) throw new Error("Failed to fetch devoirs");
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to fetch devoirs");
+        }
         const data = await response.json();
         setDevoirs(data);
       } catch (err) {
-        setError("Error loading devoirs");
+        setError(err instanceof Error ? err.message : "Error loading devoirs");
         console.error(err);
       } finally {
         setLoading(false);
@@ -111,6 +120,11 @@ export default function DevoirsPage() {
 
   const handleSave = async () => {
     try {
+      if (!filters.grade) {
+        setError("Please select a grade");
+        return;
+      }
+
       const url = editingDevoir
         ? `/api/devoirs/${editingDevoir._id}`
         : "/api/devoirs";
@@ -129,7 +143,10 @@ export default function DevoirsPage() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to save devoir");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to save devoir");
+      }
 
       const savedDevoir = await response.json();
 
@@ -138,12 +155,13 @@ export default function DevoirsPage() {
           devoirs.map((d) => (d._id === editingDevoir._id ? savedDevoir : d))
         );
       } else {
-        setDevoirs([...devoirs, savedDevoir]);
+        setDevoirs([savedDevoir, ...devoirs]);
       }
 
       setIsModalOpen(false);
+      setError("");
     } catch (err) {
-      setError("Error saving devoir");
+      setError(err instanceof Error ? err.message : "Error saving devoir");
       console.error(err);
     }
   };
@@ -199,7 +217,7 @@ export default function DevoirsPage() {
             }
             className="p-3 border-2 border-indigo-200 rounded-lg bg-white text-indigo-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
           >
-            <option value="">All Levels</option>
+            <option value="">Select Level</option>
             <option value="college">College</option>
             <option value="lycee">Lycee</option>
           </select>
@@ -210,7 +228,7 @@ export default function DevoirsPage() {
             className="p-3 border-2 border-indigo-200 rounded-lg bg-white text-indigo-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!filters.level}
           >
-            <option value="">All Grades</option>
+            <option value="">Select Grade</option>
             {filters.level === "college" && (
               <>
                 <option value="1college">First College</option>
@@ -262,6 +280,14 @@ export default function DevoirsPage() {
         {loading ? (
           <div className="text-center text-indigo-600 text-lg">
             Loading devoirs...
+          </div>
+        ) : !filters.grade ? (
+          <div className="text-center text-indigo-600 text-lg">
+            Please select a level and grade to view devoirs
+          </div>
+        ) : devoirs.length === 0 ? (
+          <div className="text-center text-indigo-600 text-lg">
+            No devoirs found for the selected criteria
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
