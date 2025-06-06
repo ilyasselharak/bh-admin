@@ -252,9 +252,11 @@ export default function DevoirsPage() {
                   Second Bac Physics Chemistry Life Sciences
                 </option>
                 <option value="2bac_tct">Second Bac Technical Common</option>
-                <option value="letters">Common Core Letters</option>
-                <option value="science">Common Core Science</option>
-                <option value="technical">Common Core Technical</option>
+                <option value="common_core_letters">Common Core Letters</option>
+                <option value="common_core_science">Common Core Science</option>
+                <option value="common_core_technical">
+                  Common Core Technical
+                </option>
               </>
             )}
           </select>
@@ -423,9 +425,15 @@ export default function DevoirsPage() {
                         <option value="2bac_tct">
                           Second Bac Technical Common
                         </option>
-                        <option value="letters">Common Core Letters</option>
-                        <option value="science">Common Core Science</option>
-                        <option value="technical">Common Core Technical</option>
+                        <option value="common_core_letters">
+                          Common Core Letters
+                        </option>
+                        <option value="common_core_science">
+                          Common Core Science
+                        </option>
+                        <option value="common_core_technical">
+                          Common Core Technical
+                        </option>
                       </>
                     )}
                   </select>
