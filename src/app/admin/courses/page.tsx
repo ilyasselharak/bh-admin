@@ -260,16 +260,30 @@ export default function CoursesPage() {
 
   const getGradeOptions = () => {
     if (filters.level === "college") {
-      return ["1", "2", "3"];
+      return [
+        { value: "1", label: "1st College" },
+        { value: "2", label: "2nd College" },
+        { value: "3", label: "3rd College" }
+      ];
     } else if (filters.level === "lycee") {
       return [
-        "math",
-        "science",
-        "2bac_math",
-        "2bac_eco",
-        "2bac_pc",
-        "2bac_tct",
-        "tct",
+        { value: "1bac_math", label: "1st Bac Math" },
+        { value: "1bac_science", label: "1st Bac Science" },
+        { value: "1bac_economics", label: "1st Bac Economics" },
+        { value: "1bac_letters", label: "1st Bac Letters" },
+        { value: "2bac_math_a", label: "2nd Bac Math A" },
+        { value: "2bac_math_b", label: "2nd Bac Math B" },
+        { value: "2bac_economics", label: "2nd Bac Economics" },
+        { value: "2bac_letters", label: "2nd Bac Letters" },
+        { value: "2bac_pcsvt", label: "2nd Bac Physics/Chemistry/Life Sciences" },
+        { value: "2bac_tct", label: "2nd Bac Technical Common" }
+      ];
+    } else if (filters.level === "common_core") {
+      return [
+        { value: "common_core", label: "Common Core" },
+        { value: "common_core_letters", label: "Common Core Letters" },
+        { value: "common_core_science", label: "Common Core Science" },
+        { value: "common_core_technical", label: "Common Core Technical" }
       ];
     }
     return [];
@@ -293,6 +307,7 @@ export default function CoursesPage() {
             <option value="">All Levels</option>
             <option value="college">College</option>
             <option value="lycee">Lycee</option>
+            <option value="common_core">Common Core</option>
           </select>
 
           <select
@@ -304,8 +319,8 @@ export default function CoursesPage() {
           >
             <option value="">All Grades</option>
             {getGradeOptions().map((grade) => (
-              <option key={grade} value={grade}>
-                {grade}
+              <option key={grade.value} value={grade.value}>
+                {grade.label}
               </option>
             ))}
           </select>

@@ -13,10 +13,15 @@ import FirstBacEconomicsCourse from "@/models/FirstBacEconomicsCourse";
 import FirstBacLettersCourse from "@/models/FirstBacLettersCourse";
 import SecondBacMathACourse from "@/models/SecondBacMathACourse";
 import SecondBacMathBCourse from "@/models/SecondBacMathBCourse";
+import SecondBacEconomicsCourse from "@/models/SecondBacEconomicsCourse";
+import SecondBacLettersCourse from "@/models/SecondBacLettersCourse";
+import SecondBacPhysicsChemistryLifeSciencesCourse from "@/models/SecondBacPhysicsChemistryLifeSciencesCourse";
+import SecondBacTechnicalCommonCourse from "@/models/SecondBacTechnicalCommonCourse";
 import CommonCoreCourse from "@/models/CommonCoreCourse";
 import CommonCoreLettersCourse from "@/models/CommonCoreLettersCourse";
 import CommonCoreScienceCourse from "@/models/CommonCoreScienceCourse";
 import CommonCoreTechnicalCourse from "@/models/CommonCoreTechnicalCourse";
+import Course from "@/models/Course";
 
 // Helper function to get the correct model based on model name
 const getModel = (modelName: string) => {
@@ -30,10 +35,15 @@ const getModel = (modelName: string) => {
     FirstBacLettersCourse,
     SecondBacMathACourse,
     SecondBacMathBCourse,
+    SecondBacEconomicsCourse,
+    SecondBacLettersCourse,
+    SecondBacPhysicsChemistryLifeSciencesCourse,
+    SecondBacTechnicalCommonCourse,
     CommonCoreCourse,
     CommonCoreLettersCourse,
     CommonCoreScienceCourse,
     CommonCoreTechnicalCourse,
+    Course,
   };
 
   return models[modelName as keyof typeof models] || null;

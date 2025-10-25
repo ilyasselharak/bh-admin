@@ -1,17 +1,33 @@
 import mongoose from "mongoose";
 
-const SecondBacLettersCourseSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  courseLink: { type: String },
-  exerciseLink: { type: String },
-  devoirLink: { type: String },
-  examenLink: { type: String },
-  level: { type: String, required: true, default: "lycee" },
-  grade: { type: String, required: true, default: "2bac_letters" },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+const SecondBacLettersCourseSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Please provide a name for this course."],
+      maxlength: [60, "Name cannot be more than 60 characters"],
+    },
+    courseLink: {
+      type: String,
+      required: false,
+    },
+    exerciseLink: {
+      type: String,
+      required: false,
+    },
+    devoirLink: {
+      type: String,
+      required: false,
+    },
+    examenLink: {
+      type: String,
+      required: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export default mongoose.models.SecondBacLettersCourse ||
   mongoose.model("SecondBacLettersCourse", SecondBacLettersCourseSchema);
