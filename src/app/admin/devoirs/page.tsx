@@ -15,7 +15,19 @@ interface Devoir {
   createdAt: string;
   updatedAt: string;
 }
+interface BlobInfo {
+  blob: () => Blob;
+  filename: () => string;
+}
 
+interface MediaData {
+  url: string;
+  type?: string;
+}
+
+interface MediaResolver {
+  html: string;
+}
 export default function DevoirsPage() {
   const { status } = useSession();
   const router = useRouter();
@@ -27,6 +39,36 @@ export default function DevoirsPage() {
     grade: "",
     semester: "1",
   });
+
+  // Model mapping for devoirs
+  const getDevoirModel = (level: string, grade: string) => {
+    const modelMap: { [key: string]: { [key: string]: string } } = {
+      college: {
+        "1": "FirstCollegeDevoir",
+        "2": "SecondCollegeDevoir", 
+        "3": "ThirdCollegeDevoir"
+      },
+      lycee: {
+        "1bac_math": "FirstBacMathDevoir",
+        "1bac_science": "FirstBacScienceDevoir",
+        "1bac_economics": "FirstBacEconomicsDevoir",
+        "1bac_letters": "FirstBacLettersDevoir",
+        "2bac_math_a": "SecondBacMathADevoir",
+        "2bac_math_b": "SecondBacMathBDevoir",
+        "2bac_economics": "SecondBacEconomicsDevoir",
+        "2bac_letters": "SecondBacLettersDevoir",
+        "2bac_pcsvt": "SecondBacPhysicsChemistryLifeSciencesDevoir",
+        "2bac_tct": "SecondBacTechnicalCommonDevoir"
+      },
+      common_core: {
+        "letters": "CommonCoreLettersDevoir",
+        "science": "CommonCoreScienceDevoir",
+        "technical": "CommonCoreTechnicalDevoir"
+      }
+    };
+    
+    return modelMap[level]?.[grade] || null;
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDevoir, setEditingDevoir] = useState<Devoir | null>(null);
@@ -62,6 +104,47 @@ export default function DevoirsPage() {
       "image media | removeformat | help",
     content_style:
       "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+    images_upload_url: "/api/upload",
+    images_upload_handler: async (blobInfo: BlobInfo) => {
+      try {
+        const formData = new FormData();
+        formData.append("file", blobInfo.blob(), blobInfo.filename());
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const data = await response.json();
+        return data.url;
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        throw new Error("Failed to upload file");
+      }
+    },
+    automatic_uploads: true,
+    file_picker_types: "image media file",
+    images_reuse_filename: true,
+    images_upload_base_path: "/uploads",
+    media_live_embeds: true,
+    media_url_resolver: function (
+      data: MediaData,
+      resolve: (result: MediaResolver) => void
+    ) {
+      if (data.url.toLowerCase().includes("drive.google")) {
+        resolve({
+          html: `<iframe src="${data.url}" width="100%" height="500px" style="border: none;"></iframe>`,
+        });
+      } else {
+        resolve({
+          html: `<video controls width="100%"><source src="${data.url}" type="video/mp4"></video>`,
+        });
+      }
+    },
   };
 
   useEffect(() => {
@@ -74,14 +157,21 @@ export default function DevoirsPage() {
     const fetchDevoirs = async () => {
       try {
         setLoading(true);
-        if (!filters.grade) {
+        if (!filters.level || !filters.grade) {
+          setDevoirs([]);
+          setLoading(false);
+          return;
+        }
+
+        const modelName = getDevoirModel(filters.level, filters.grade);
+        if (!modelName) {
           setDevoirs([]);
           setLoading(false);
           return;
         }
 
         const response = await fetch(
-          `/api/devoirs?type=${filters.grade}&semester=${filters.semester}`
+          `/api/devoirs?model=${modelName}&semester=${filters.semester}`
         );
         if (!response.ok) {
           const error = await response.json();
@@ -120,8 +210,14 @@ export default function DevoirsPage() {
 
   const handleSave = async () => {
     try {
-      if (!filters.grade) {
-        setError("Please select a grade");
+      if (!filters.level || !filters.grade) {
+        setError("Please select a level and grade");
+        return;
+      }
+
+      const modelName = getDevoirModel(filters.level, filters.grade);
+      if (!modelName) {
+        setError("Invalid level and grade combination");
         return;
       }
 
@@ -139,7 +235,9 @@ export default function DevoirsPage() {
           title,
           content,
           semester,
-          type: filters.grade,
+          model: modelName,
+          level: filters.level,
+          grade: filters.grade,
         }),
       });
 
@@ -220,6 +318,7 @@ export default function DevoirsPage() {
             <option value="">Select Level</option>
             <option value="college">College</option>
             <option value="lycee">Lycee</option>
+            <option value="common_core">Common Core</option>
           </select>
 
           <select
@@ -231,9 +330,9 @@ export default function DevoirsPage() {
             <option value="">Select Grade</option>
             {filters.level === "college" && (
               <>
-                <option value="1college">First College</option>
-                <option value="2college">Second College</option>
-                <option value="3college">Third College</option>
+                <option value="1">First College</option>
+                <option value="2">Second College</option>
+                <option value="3">Third College</option>
               </>
             )}
             {filters.level === "lycee" && (
@@ -252,11 +351,13 @@ export default function DevoirsPage() {
                   Second Bac Physics Chemistry Life Sciences
                 </option>
                 <option value="2bac_tct">Second Bac Technical Common</option>
-                <option value="common_core_letters">Common Core Letters</option>
-                <option value="common_core_science">Common Core Science</option>
-                <option value="common_core_technical">
-                  Common Core Technical
-                </option>
+              </>
+            )}
+            {filters.level === "common_core" && (
+              <>
+                <option value="letters">Common Core Letters</option>
+                <option value="science">Common Core Science</option>
+                <option value="technical">Common Core Technical</option>
               </>
             )}
           </select>
@@ -378,6 +479,7 @@ export default function DevoirsPage() {
                     <option value="">Select Level</option>
                     <option value="college">College</option>
                     <option value="lycee">Lycee</option>
+                    <option value="common_core">Common Core</option>
                   </select>
                 </div>
 
@@ -396,9 +498,9 @@ export default function DevoirsPage() {
                     <option value="">Select Grade</option>
                     {filters.level === "college" && (
                       <>
-                        <option value="1college">First College</option>
-                        <option value="2college">Second College</option>
-                        <option value="3college">Third College</option>
+                        <option value="1">First College</option>
+                        <option value="2">Second College</option>
+                        <option value="3">Third College</option>
                       </>
                     )}
                     {filters.level === "lycee" && (
@@ -425,15 +527,13 @@ export default function DevoirsPage() {
                         <option value="2bac_tct">
                           Second Bac Technical Common
                         </option>
-                        <option value="common_core_letters">
-                          Common Core Letters
-                        </option>
-                        <option value="common_core_science">
-                          Common Core Science
-                        </option>
-                        <option value="common_core_technical">
-                          Common Core Technical
-                        </option>
+                      </>
+                    )}
+                    {filters.level === "common_core" && (
+                      <>
+                        <option value="letters">Common Core Letters</option>
+                        <option value="science">Common Core Science</option>
+                        <option value="technical">Common Core Technical</option>
                       </>
                     )}
                   </select>

@@ -32,73 +32,38 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get("type") || "letters";
+    const model = searchParams.get("model");
     const semester = searchParams.get("semester") || "1";
+
+    if (!model) {
+      return NextResponse.json({ message: "Model parameter is required" }, { status: 400 });
+    }
 
     await connectDB();
 
-    let Model;
-    switch (type) {
-      // College
-      case "1college":
-        Model = FirstCollegeDevoir;
-        break;
-      case "2college":
-        Model = SecondCollegeDevoir;
-        break;
-      case "3college":
-        Model = ThirdCollegeDevoir;
-        break;
-      // First Bac
-      case "1bac_math":
-        Model = FirstBacMathDevoir;
-        break;
-      case "1bac_science":
-        Model = FirstBacScienceDevoir;
-        break;
-      case "1bac_economics":
-        Model = FirstBacEconomicsDevoir;
-        break;
-      case "1bac_letters":
-        Model = FirstBacLettersDevoir;
-        break;
-      // Second Bac
-      case "2bac_math_a":
-        Model = SecondBacMathADevoir;
-        break;
-      case "2bac_math_b":
-        Model = SecondBacMathBDevoir;
-        break;
-      case "2bac_physics":
-        Model = SecondBacPhysicsDevoir;
-        break;
-      case "2bac_economics":
-        Model = SecondBacEconomicsDevoir;
-        break;
-      case "2bac_technical":
-        Model = SecondBacTechnicalDevoir;
-        break;
-      case "2bac_letters":
-        Model = SecondBacLettersDevoir;
-        break;
-      case "2bac_pcsvt":
-        Model = SecondBacPhysicsChemistryLifeSciencesDevoir;
-        break;
-      case "2bac_tct":
-        Model = SecondBacTechnicalCommonDevoir;
-        break;
-      // Common Core
-      case "letters":
-        Model = CommonCoreLettersDevoir;
-        break;
-      case "science":
-        Model = CommonCoreScienceDevoir;
-        break;
-      case "technical":
-        Model = CommonCoreTechnicalDevoir;
-        break;
-      default:
-        return NextResponse.json({ message: "Invalid type" }, { status: 400 });
+    // Model mapping
+    const modelMap: { [key: string]: any } = {
+      "FirstCollegeDevoir": FirstCollegeDevoir,
+      "SecondCollegeDevoir": SecondCollegeDevoir,
+      "ThirdCollegeDevoir": ThirdCollegeDevoir,
+      "FirstBacMathDevoir": FirstBacMathDevoir,
+      "FirstBacScienceDevoir": FirstBacScienceDevoir,
+      "FirstBacEconomicsDevoir": FirstBacEconomicsDevoir,
+      "FirstBacLettersDevoir": FirstBacLettersDevoir,
+      "SecondBacMathADevoir": SecondBacMathADevoir,
+      "SecondBacMathBDevoir": SecondBacMathBDevoir,
+      "SecondBacEconomicsDevoir": SecondBacEconomicsDevoir,
+      "SecondBacLettersDevoir": SecondBacLettersDevoir,
+      "SecondBacPhysicsChemistryLifeSciencesDevoir": SecondBacPhysicsChemistryLifeSciencesDevoir,
+      "SecondBacTechnicalCommonDevoir": SecondBacTechnicalCommonDevoir,
+      "CommonCoreLettersDevoir": CommonCoreLettersDevoir,
+      "CommonCoreScienceDevoir": CommonCoreScienceDevoir,
+      "CommonCoreTechnicalDevoir": CommonCoreTechnicalDevoir,
+    };
+
+    const Model = modelMap[model];
+    if (!Model) {
+      return NextResponse.json({ message: "Invalid model specified" }, { status: 400 });
     }
 
     const devoirs = await Model.find({ semester: Number(semester) }).sort({
@@ -124,9 +89,9 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, content, semester, type } = body;
+    const { title, content, semester, model, level, grade } = body;
 
-    if (!title || !content || !semester || !type) {
+    if (!title || !content || !semester || !model) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -135,74 +100,37 @@ export async function POST(request: Request) {
 
     await connectDB();
 
-    let Model;
-    switch (type) {
-      // College
-      case "1college":
-        Model = FirstCollegeDevoir;
-        break;
-      case "2college":
-        Model = SecondCollegeDevoir;
-        break;
-      case "3college":
-        Model = ThirdCollegeDevoir;
-        break;
-      // First Bac
-      case "1bac_math":
-        Model = FirstBacMathDevoir;
-        break;
-      case "1bac_science":
-        Model = FirstBacScienceDevoir;
-        break;
-      case "1bac_economics":
-        Model = FirstBacEconomicsDevoir;
-        break;
-      case "1bac_letters":
-        Model = FirstBacLettersDevoir;
-        break;
-      // Second Bac
-      case "2bac_math_a":
-        Model = SecondBacMathADevoir;
-        break;
-      case "2bac_math_b":
-        Model = SecondBacMathBDevoir;
-        break;
-      case "2bac_physics":
-        Model = SecondBacPhysicsDevoir;
-        break;
-      case "2bac_economics":
-        Model = SecondBacEconomicsDevoir;
-        break;
-      case "2bac_technical":
-        Model = SecondBacTechnicalDevoir;
-        break;
-      case "2bac_letters":
-        Model = SecondBacLettersDevoir;
-        break;
-      case "2bac_pcsvt":
-        Model = SecondBacPhysicsChemistryLifeSciencesDevoir;
-        break;
-      case "2bac_tct":
-        Model = SecondBacTechnicalCommonDevoir;
-        break;
-      // Common Core
-      case "letters":
-        Model = CommonCoreLettersDevoir;
-        break;
-      case "science":
-        Model = CommonCoreScienceDevoir;
-        break;
-      case "technical":
-        Model = CommonCoreTechnicalDevoir;
-        break;
-      default:
-        return NextResponse.json({ message: "Invalid type" }, { status: 400 });
+    // Model mapping
+    const modelMap: { [key: string]: any } = {
+      "FirstCollegeDevoir": FirstCollegeDevoir,
+      "SecondCollegeDevoir": SecondCollegeDevoir,
+      "ThirdCollegeDevoir": ThirdCollegeDevoir,
+      "FirstBacMathDevoir": FirstBacMathDevoir,
+      "FirstBacScienceDevoir": FirstBacScienceDevoir,
+      "FirstBacEconomicsDevoir": FirstBacEconomicsDevoir,
+      "FirstBacLettersDevoir": FirstBacLettersDevoir,
+      "SecondBacMathADevoir": SecondBacMathADevoir,
+      "SecondBacMathBDevoir": SecondBacMathBDevoir,
+      "SecondBacEconomicsDevoir": SecondBacEconomicsDevoir,
+      "SecondBacLettersDevoir": SecondBacLettersDevoir,
+      "SecondBacPhysicsChemistryLifeSciencesDevoir": SecondBacPhysicsChemistryLifeSciencesDevoir,
+      "SecondBacTechnicalCommonDevoir": SecondBacTechnicalCommonDevoir,
+      "CommonCoreLettersDevoir": CommonCoreLettersDevoir,
+      "CommonCoreScienceDevoir": CommonCoreScienceDevoir,
+      "CommonCoreTechnicalDevoir": CommonCoreTechnicalDevoir,
+    };
+
+    const Model = modelMap[model];
+    if (!Model) {
+      return NextResponse.json({ message: "Invalid model specified" }, { status: 400 });
     }
 
     const devoir = await Model.create({
       title,
       content,
       semester: Number(semester),
+      level: level || "college",
+      grade: grade || "1",
     });
 
     return NextResponse.json(devoir);
