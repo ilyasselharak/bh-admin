@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import connectDB from "@/lib/mongodb";
 import { authOptions } from "../auth/[...nextauth]/auth.config";
+import mongoose from "mongoose";
 
 // Import all devoir models
 import FirstCollegeDevoir from "@/models/FirstCollegeDevoir";
@@ -13,9 +14,7 @@ import FirstBacEconomicsDevoir from "@/models/FirstBacEconomicsDevoir";
 import FirstBacLettersDevoir from "@/models/FirstBacLettersDevoir";
 import SecondBacMathADevoir from "@/models/SecondBacMathADevoir";
 import SecondBacMathBDevoir from "@/models/SecondBacMathBDevoir";
-import SecondBacPhysicsDevoir from "@/models/SecondBacPhysicsDevoir";
 import SecondBacEconomicsDevoir from "@/models/SecondBacEconomicsDevoir";
-import SecondBacTechnicalDevoir from "@/models/SecondBacTechnicalDevoir";
 import SecondBacLettersDevoir from "@/models/SecondBacLettersDevoir";
 import SecondBacPhysicsChemistryLifeSciencesDevoir from "@/models/SecondBacPhysicsChemistryLifeSciencesDevoir";
 import SecondBacTechnicalCommonDevoir from "@/models/SecondBacTechnicalCommonDevoir";
@@ -42,7 +41,17 @@ export async function GET(request: Request) {
     await connectDB();
 
     // Model mapping
-    const modelMap: { [key: string]: any } = {
+    type DevoirModel = mongoose.Model<{
+      title: string;
+      content: string;
+      semester: number;
+      level?: string;
+      grade?: string;
+      createdAt?: Date;
+      updatedAt?: Date;
+    }>;
+
+    const modelMap: Record<string, DevoirModel> = {
       "FirstCollegeDevoir": FirstCollegeDevoir,
       "SecondCollegeDevoir": SecondCollegeDevoir,
       "ThirdCollegeDevoir": ThirdCollegeDevoir,
@@ -101,7 +110,17 @@ export async function POST(request: Request) {
     await connectDB();
 
     // Model mapping
-    const modelMap: { [key: string]: any } = {
+    type DevoirModel = mongoose.Model<{
+      title: string;
+      content: string;
+      semester: number;
+      level?: string;
+      grade?: string;
+      createdAt?: Date;
+      updatedAt?: Date;
+    }>;
+
+    const modelMap: Record<string, DevoirModel> = {
       "FirstCollegeDevoir": FirstCollegeDevoir,
       "SecondCollegeDevoir": SecondCollegeDevoir,
       "ThirdCollegeDevoir": ThirdCollegeDevoir,
