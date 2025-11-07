@@ -76,12 +76,13 @@ export async function PUT(request: Request, context: any) {
     }
 
     return NextResponse.json(book);
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error updating book:", error);
     
     // Handle validation errors
-    if (error.name === "ValidationError") {
-      const messages = Object.values(error.errors).map((err: any) => err.message);
+    if (error && typeof error === "object" && "name" in error && error.name === "ValidationError" && "errors" in error) {
+      const validationError = error as { errors: Record<string, { message: string }> };
+      const messages = Object.values(validationError.errors).map((err) => err.message);
       return NextResponse.json(
         { message: messages.join(", ") },
         { status: 400 }

@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Editor } from "@tinymce/tinymce-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Book {
   _id: string;
@@ -191,8 +192,9 @@ export default function BooksPage() {
 
       setIsModalOpen(false);
       setEditingBook(null);
-    } catch (err: any) {
-      setError(err.message || "Error updating book");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Error updating book";
+      setError(errorMessage);
       console.error(err);
     }
   };
@@ -257,11 +259,15 @@ export default function BooksPage() {
                 className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-indigo-100"
               >
                 {book.image && (
-                  <img
-                    src={book.image}
-                    alt={book.title}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
+                  <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
+                    <Image
+                      src={book.image}
+                      alt={book.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  </div>
                 )}
                 <h2 className="text-xl font-semibold mb-2 text-indigo-900">
                   {book.title}

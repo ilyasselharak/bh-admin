@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const isActive = searchParams.get("isActive");
 
-    let query: { isActive?: boolean } = {};
+    const query: { isActive?: boolean } = {};
     if (isActive !== null) {
       query.isActive = isActive === "true";
     }
@@ -63,12 +63,13 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(book, { status: 201 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error creating book:", error);
     
     // Handle validation errors
-    if (error.name === "ValidationError") {
-      const messages = Object.values(error.errors).map((err: any) => err.message);
+    if (error && typeof error === "object" && "name" in error && error.name === "ValidationError" && "errors" in error) {
+      const validationError = error as { errors: Record<string, { message: string }> };
+      const messages = Object.values(validationError.errors).map((err) => err.message);
       return NextResponse.json(
         { message: messages.join(", ") },
         { status: 400 }
