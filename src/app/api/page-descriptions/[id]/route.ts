@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/auth.config";
-import Book from "@/models/Book";
+import PageDescription from "@/models/PageDescription";
 
-// GET /api/books/[id] - Get a single book
+// GET /api/page-descriptions/[id] - Get a single page description
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function GET(request: NextRequest, context: any) {
   try {
@@ -20,32 +20,32 @@ export async function GET(request: NextRequest, context: any) {
 
     if (!id) {
       return NextResponse.json(
-        { message: "Book ID is required" },
+        { message: "Page description ID is required" },
         { status: 400 }
       );
     }
 
     await connectDB();
-    const book = await Book.findById(id);
+    const pageDescription = await PageDescription.findById(id);
 
-    if (!book) {
+    if (!pageDescription) {
       return NextResponse.json(
-        { message: "Book not found" },
+        { message: "Page description not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(book);
+    return NextResponse.json(pageDescription);
   } catch (error) {
-    console.error("Error fetching book:", error);
+    console.error("Error fetching page description:", error);
     return NextResponse.json(
-      { message: "Error fetching book" },
+      { message: "Error fetching page description" },
       { status: 500 }
     );
   }
 }
 
-// PUT /api/books/[id] - Update a book
+// PUT /api/page-descriptions/[id] - Update a page description
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function PUT(request: Request, context: any) {
   try {
@@ -61,45 +61,44 @@ export async function PUT(request: Request, context: any) {
 
     if (!id) {
       return NextResponse.json(
-        { message: "Book ID is required" },
+        { message: "Page description ID is required" },
         { status: 400 }
       );
     }
 
     const body = await request.json();
-    const { title, content, image, description, author, isActive } = body;
+    const { pagePath, title, description, shortDescription, isActive } = body;
 
-    if (!title || !content) {
+    if (!pagePath || !title || !description) {
       return NextResponse.json(
-        { message: "Title and content are required" },
+        { message: "Page path, title, and description are required" },
         { status: 400 }
       );
     }
 
     await connectDB();
-    const book = await Book.findByIdAndUpdate(
+    const pageDescription = await PageDescription.findByIdAndUpdate(
       id,
       {
-        title,
-        content,
-        image: image || null,
-        description: description || "",
-        author: author || "",
+        pagePath: pagePath.trim(),
+        title: title.trim(),
+        description: description.trim(),
+        shortDescription: shortDescription?.trim() || "",
         isActive: isActive !== undefined ? isActive : true,
       },
       { new: true, runValidators: true }
     );
 
-    if (!book) {
+    if (!pageDescription) {
       return NextResponse.json(
-        { message: "Book not found" },
+        { message: "Page description not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(book);
+    return NextResponse.json(pageDescription);
   } catch (error) {
-    console.error("Error updating book:", error);
+    console.error("Error updating page description:", error);
     
     // Handle validation errors
     if (error && typeof error === "object" && "name" in error && error.name === "ValidationError" && "errors" in error) {
@@ -111,14 +110,22 @@ export async function PUT(request: Request, context: any) {
       );
     }
 
+    // Handle duplicate key error
+    if (error && typeof error === "object" && "code" in error && error.code === 11000) {
+      return NextResponse.json(
+        { message: "Page path already exists" },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json(
-      { message: "Error updating book" },
+      { message: "Error updating page description" },
       { status: 500 }
     );
   }
 }
 
-// DELETE /api/books/[id] - Delete a book
+// DELETE /api/page-descriptions/[id] - Delete a page description
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function DELETE(request: Request, context: any) {
   try {
@@ -134,27 +141,27 @@ export async function DELETE(request: Request, context: any) {
 
     if (!id) {
       return NextResponse.json(
-        { message: "Book ID is required" },
+        { message: "Page description ID is required" },
         { status: 400 }
       );
     }
 
     await connectDB();
 
-    const book = await Book.findByIdAndDelete(id);
+    const pageDescription = await PageDescription.findByIdAndDelete(id);
 
-    if (!book) {
+    if (!pageDescription) {
       return NextResponse.json(
-        { message: "Book not found" },
+        { message: "Page description not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ message: "Book deleted successfully" });
+    return NextResponse.json({ message: "Page description deleted successfully" });
   } catch (error) {
-    console.error("Error deleting book:", error);
+    console.error("Error deleting page description:", error);
     return NextResponse.json(
-      { message: "Error deleting book" },
+      { message: "Error deleting page description" },
       { status: 500 }
     );
   }

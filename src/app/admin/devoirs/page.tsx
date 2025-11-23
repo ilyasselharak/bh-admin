@@ -270,16 +270,22 @@ export default function DevoirsPage() {
     }
 
     try {
+      setError("");
       const response = await fetch(`/api/devoirs/${devoirId}`, {
         method: "DELETE",
       });
 
-      if (!response.ok) throw new Error("Failed to delete devoir");
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to delete devoir");
+      }
 
+      // Remove the devoir from the local state
       setDevoirs(devoirs.filter((d) => d._id !== devoirId));
     } catch (err) {
-      setError("Error deleting devoir");
-      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : "Error deleting devoir";
+      setError(errorMessage);
+      console.error("Delete error:", err);
     }
   };
 

@@ -147,78 +147,51 @@ export async function DELETE(request: Request, context: any) {
     }
 
     const { params } = context;
-    const { searchParams } = new URL(request.url);
-    const type = searchParams.get("type") || "letters";
+    // Handle both sync and async params (Next.js 15 compatibility)
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const id = resolvedParams?.id;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Devoir ID is required" },
+        { status: 400 }
+      );
+    }
 
     await connectDB();
 
-    let Model;
-    switch (type) {
-      // College
-      case "1college":
-        Model = FirstCollegeDevoir;
+    // Try to delete from all possible collections
+    const collections = [
+      FirstCollegeDevoir,
+      SecondCollegeDevoir,
+      ThirdCollegeDevoir,
+      FirstBacMathDevoir,
+      FirstBacScienceDevoir,
+      FirstBacEconomicsDevoir,
+      FirstBacLettersDevoir,
+      SecondBacMathADevoir,
+      SecondBacMathBDevoir,
+      SecondBacPhysicsDevoir,
+      SecondBacEconomicsDevoir,
+      SecondBacTechnicalDevoir,
+      SecondBacLettersDevoir,
+      SecondBacPhysicsChemistryLifeSciencesDevoir,
+      SecondBacTechnicalCommonDevoir,
+      CommonCoreLettersDevoir,
+      CommonCoreScienceDevoir,
+      CommonCoreTechnicalDevoir,
+    ];
+
+    let deleted = false;
+    for (const Model of collections) {
+      const result = await Model.findByIdAndDelete(id);
+      if (result) {
+        deleted = true;
         break;
-      case "2college":
-        Model = SecondCollegeDevoir;
-        break;
-      case "3college":
-        Model = ThirdCollegeDevoir;
-        break;
-      // First Bac
-      case "1bac_math":
-        Model = FirstBacMathDevoir;
-        break;
-      case "1bac_science":
-        Model = FirstBacScienceDevoir;
-        break;
-      case "1bac_economics":
-        Model = FirstBacEconomicsDevoir;
-        break;
-      case "1bac_letters":
-        Model = FirstBacLettersDevoir;
-        break;
-      // Second Bac
-      case "2bac_math_a":
-        Model = SecondBacMathADevoir;
-        break;
-      case "2bac_math_b":
-        Model = SecondBacMathBDevoir;
-        break;
-      case "2bac_physics":
-        Model = SecondBacPhysicsDevoir;
-        break;
-      case "2bac_economics":
-        Model = SecondBacEconomicsDevoir;
-        break;
-      case "2bac_technical":
-        Model = SecondBacTechnicalDevoir;
-        break;
-      case "2bac_letters":
-        Model = SecondBacLettersDevoir;
-        break;
-      case "2bac_pcsvt":
-        Model = SecondBacPhysicsChemistryLifeSciencesDevoir;
-        break;
-      case "2bac_tct":
-        Model = SecondBacTechnicalCommonDevoir;
-        break;
-      // Common Core
-      case "letters":
-        Model = CommonCoreLettersDevoir;
-        break;
-      case "science":
-        Model = CommonCoreScienceDevoir;
-        break;
-      case "technical":
-        Model = CommonCoreTechnicalDevoir;
-        break;
-      default:
-        return NextResponse.json({ message: "Invalid type" }, { status: 400 });
+      }
     }
 
-    const devoir = await Model.findByIdAndDelete(params.id);
-
-    if (!devoir) {
+    if (!deleted) {
       return NextResponse.json(
         { message: "Devoir not found" },
         { status: 404 }

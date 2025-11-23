@@ -5,10 +5,9 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Editor } from "@tinymce/tinymce-react";
 import Link from "next/link";
-import Image from "next/image";
 
 interface Book {
-  _id: string;
+  id: string;
   title: string;
   content: string;
   image: string | null;
@@ -162,7 +161,7 @@ export default function BooksPage() {
 
     try {
       setError("");
-      const response = await fetch(`/api/books/${editingBook._id}`, {
+      const response = await fetch(`/api/books/${editingBook.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -186,7 +185,7 @@ export default function BooksPage() {
       const updatedBook = await response.json();
       setBooks(
         books.map((book) =>
-          book._id === editingBook._id ? updatedBook : book
+          book.id === editingBook.id ? updatedBook : book
         )
       );
 
@@ -210,13 +209,17 @@ export default function BooksPage() {
         method: "DELETE",
       });
 
-      if (!response.ok) throw new Error("Failed to delete book");
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to delete book");
+      }
 
       // Remove the book from the local state
-      setBooks(books.filter((book) => book._id !== bookId));
+      setBooks(books.filter((book) => book.id !== bookId));
     } catch (err) {
-      setError("Error deleting book");
-      console.error(err);
+      const errorMessage = err instanceof Error ? err.message : "Error deleting book";
+      setError(errorMessage);
+      console.error("Delete error:", err);
     }
   };
 
@@ -227,6 +230,7 @@ export default function BooksPage() {
       </div>
     );
   }
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -253,20 +257,26 @@ export default function BooksPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {books.map((book) => (
+            {books.map((book, index) => (
               <div
-                key={book._id}
+                key={book.id || `book-${index}`}
                 className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-indigo-100"
               >
                 {book.image && (
-                  <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
-                    <Image
-                      src={book.image}
-                      alt={book.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
+                  <div className="w-full h-48 mb-4 rounded-lg overflow-hidden bg-gray-200">
+                    {book.image.toLowerCase().includes("drive.google") ? (
+                      <iframe
+                        src={book.image}
+                        className="w-full h-full border-0"
+                        title={book.title}
+                      />
+                    ) : (
+                      <img
+                        src={book.image}
+                        alt={book.title}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
                 )}
                 <h2 className="text-xl font-semibold mb-2 text-indigo-900">
@@ -301,7 +311,7 @@ export default function BooksPage() {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(book._id)}
+                    onClick={() => handleDelete(book.id)}
                     className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                   >
                     Delete
