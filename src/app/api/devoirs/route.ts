@@ -98,7 +98,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, content, semester, model, level, grade } = body;
+    const { title, content, pdfUrl, semester, model, level, grade } = body;
 
     if (!title || !content || !semester || !model) {
       return NextResponse.json(
@@ -113,6 +113,7 @@ export async function POST(request: Request) {
     type DevoirModel = mongoose.Model<{
       title: string;
       content: string;
+      pdfUrl?: string;
       semester: number;
       level?: string;
       grade?: string;
@@ -147,6 +148,7 @@ export async function POST(request: Request) {
     const devoir = await Model.create({
       title,
       content,
+      pdfUrl: pdfUrl || undefined,
       semester: Number(semester),
       level: level || "college",
       grade: grade || "1",

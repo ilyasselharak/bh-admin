@@ -45,7 +45,7 @@ export async function PATCH(request: Request, context: any) {
     }
 
     const body = await request.json();
-    const { title, content, semester, type } = body;
+    const { title, content, pdfUrl, semester, type } = body;
 
     if (!title || !content || semester === undefined || !type) {
       return NextResponse.json(
@@ -120,14 +120,26 @@ export async function PATCH(request: Request, context: any) {
         return NextResponse.json({ message: "Invalid type" }, { status: 400 });
     }
 
+    const updateData: {
+      title: string;
+      content: string;
+      pdfUrl?: string;
+      semester: number;
+      updatedAt: Date;
+    } = {
+      title,
+      content,
+      semester: Number(semester),
+      updatedAt: new Date(),
+    };
+
+    if (pdfUrl !== undefined) {
+      updateData.pdfUrl = pdfUrl || undefined;
+    }
+
     const devoir = await Model.findByIdAndUpdate(
       id,
-      {
-        title,
-        content,
-        semester: Number(semester),
-        updatedAt: new Date(),
-      },
+      updateData,
       { new: true }
     );
 

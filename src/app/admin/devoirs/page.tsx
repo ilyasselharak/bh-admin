@@ -9,6 +9,7 @@ interface Devoir {
   _id: string;
   title: string;
   content: string;
+  pdfUrl?: string;
   semester: number;
   level: string;
   grade: string;
@@ -74,6 +75,7 @@ export default function DevoirsPage() {
   const [editingDevoir, setEditingDevoir] = useState<Devoir | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [pdfUrl, setPdfUrl] = useState("");
   const [semester, setSemester] = useState(1);
 
   const editorConfig = {
@@ -196,6 +198,7 @@ export default function DevoirsPage() {
     setEditingDevoir(null);
     setTitle("");
     setContent("");
+    setPdfUrl("");
     setSemester(1);
     setIsModalOpen(true);
   };
@@ -204,6 +207,7 @@ export default function DevoirsPage() {
     setEditingDevoir(devoir);
     setTitle(devoir.title);
     setContent(devoir.content);
+    setPdfUrl(devoir.pdfUrl || "");
     setSemester(devoir.semester);
     setIsModalOpen(true);
   };
@@ -240,6 +244,7 @@ export default function DevoirsPage() {
         body: JSON.stringify({
           title,
           content,
+          pdfUrl: pdfUrl.trim() || undefined,
           semester,
           type,
           model: modelName,
@@ -550,6 +555,19 @@ export default function DevoirsPage() {
                       </>
                     )}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    PDF URL
+                  </label>
+                  <input
+                    type="url"
+                    value={pdfUrl}
+                    onChange={(e) => setPdfUrl(e.target.value)}
+                    className="w-full p-3 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
+                    placeholder="https://example.com/document.pdf"
+                  />
                 </div>
 
                 <div>
