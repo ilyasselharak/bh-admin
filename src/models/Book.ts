@@ -17,6 +17,11 @@ const bookSchema = new mongoose.Schema({
     trim: true,
     default: null
   },
+  pdfUrl: {
+    type: String,
+    trim: true,
+    default: null
+  },
   description: {
     type: String,
     trim: true,
