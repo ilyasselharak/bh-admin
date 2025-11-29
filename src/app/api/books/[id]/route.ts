@@ -67,7 +67,7 @@ export async function PUT(request: Request, context: any) {
     }
 
     const body = await request.json();
-    const { title, content, image, description,pdfUrl, author, isActive } = body;
+    const { title, content, image, description, author, isActive } = body;
 
     if (!title || !content) {
       return NextResponse.json(
@@ -84,7 +84,6 @@ export async function PUT(request: Request, context: any) {
         content,
         image: image || null,
         description: description || "",
-        pdfUrl: pdfUrl || null,
         author: author || "",
         isActive: isActive !== undefined ? isActive : true,
       },

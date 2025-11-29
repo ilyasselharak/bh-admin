@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, content, image, description, pdfUrl, author, isActive } = body;
+    const { title, content, image, description, author, isActive } = body;
 
     if (!title || !content) {
       return NextResponse.json(
@@ -57,7 +57,6 @@ export async function POST(request: NextRequest) {
       title,
       content,
       image: image || null,
-      pdfUrl: pdfUrl || null,
       description: description || "",
       author: author || "",
       isActive: isActive !== undefined ? isActive : true,

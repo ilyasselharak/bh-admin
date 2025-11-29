@@ -11,7 +11,6 @@ interface Book {
   title: string;
   content: string;
   image: string | null;
-  pdfUrl: string | null;
   description: string;
   author: string;
   isActive: boolean;
@@ -46,7 +45,6 @@ export default function BooksPage() {
   const [editedDescription, setEditedDescription] = useState("");
   const [editedAuthor, setEditedAuthor] = useState("");
   const [editedImage, setEditedImage] = useState("");
-  const [editedpdfUrl, setEditedPdfUrl] = useState("");
   const [editedIsActive, setEditedIsActive] = useState(true);
 
   const editorConfig = {
@@ -154,7 +152,6 @@ export default function BooksPage() {
     setEditedDescription(book.description || "");
     setEditedAuthor(book.author || "");
     setEditedImage(book.image || "");
-    setEditedPdfUrl(book.pdfUrl || "");
     setEditedIsActive(book.isActive);
     setIsModalOpen(true);
   };
@@ -175,7 +172,6 @@ export default function BooksPage() {
           description: editedDescription,
           author: editedAuthor,
           image: editedImage || null,
-          pdfUrl: editedpdfUrl || null,
           isActive: editedIsActive,
         }),
       });
@@ -374,18 +370,6 @@ export default function BooksPage() {
                     type="text"
                     value={editedImage}
                     onChange={(e) => setEditedImage(e.target.value)}
-                    className="w-full px-4 py-2 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pdf URL
-                  </label>
-                  <input
-                    type="text"
-                    value={editedpdfUrl}
-                    onChange={(e) => setEditedPdfUrl(e.target.value)}
                     className="w-full px-4 py-2 border-2 border-indigo-200 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
                     placeholder="https://example.com/image.jpg"
                   />

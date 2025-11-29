@@ -33,10 +33,21 @@ export async function PATCH(request: Request, context: any) {
     }
 
     const { params } = context;
+    // Handle both sync and async params (Next.js 15 compatibility)
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const id = resolvedParams?.id;
+
+    if (!id) {
+      return NextResponse.json(
+        { message: "Devoir ID is required" },
+        { status: 400 }
+      );
+    }
+
     const body = await request.json();
     const { title, content, semester, type } = body;
 
-    if (!title || !content || !semester || !type) {
+    if (!title || !content || semester === undefined || !type) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -110,7 +121,7 @@ export async function PATCH(request: Request, context: any) {
     }
 
     const devoir = await Model.findByIdAndUpdate(
-      params.id,
+      id,
       {
         title,
         content,

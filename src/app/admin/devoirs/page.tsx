@@ -226,6 +226,12 @@ export default function DevoirsPage() {
         : "/api/devoirs";
       const method = editingDevoir ? "PATCH" : "POST";
 
+      // Map grade to type for API
+      let type = filters.grade;
+      if (filters.level === "college") {
+        type = `${filters.grade}college`;
+      }
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -235,6 +241,7 @@ export default function DevoirsPage() {
           title,
           content,
           semester,
+          type,
           model: modelName,
           level: filters.level,
           grade: filters.grade,
