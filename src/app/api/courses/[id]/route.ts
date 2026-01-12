@@ -1,50 +1,71 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "../../auth/[...nextauth]/auth.config";
 import Course from "../../../../models/Course";
 
 // Import all course models
-import First_Collegue_Course from "@/models/First_Collegue_Course";
-import Second_Collegue_Course from "@/models/Second_Collegue_Course";
-import Third_Collegue_Course from "@/models/Third_Collegue_Course";
-import Secondary_Math_Lycee_Courses from "@/models/Secondary_Math_Lycee_Courses";
-import Secondary_Science_Lycee_Courses from "@/models/Secondary_Science_Lycee_Courses";
-import Secondary_2Bac_Lycee_Math_Courses from "@/models/Secondary_2Bac_Lycee_Math_Courses";
-import Secondary_2Bac_Lycee_Eco_Courses from "@/models/Secondary_2Bac_Lycee_Eco_Courses";
-import Secondary_2Bac_Lycee_Pc_Courses from "@/models/Secondary_2Bac_Lycee_Pc_Courses";
-import Secondary_2Bac_Lycee_Tct_Courses from "@/models/Secondary_2Bac_Lycee_Tct_Courses";
-import Tct_Course from "@/models/Tct_Course";
+import FirstCollegeCourse from "@/models/FirstCollegeCourse";
+import SecondCollegeCourse from "@/models/SecondCollegeCourse";
+import ThirdCollegeCourse from "@/models/ThirdCollegeCourse";
+import FirstBacMathCourse from "@/models/FirstBacMathCourse";
+import FirstBacScienceCourse from "@/models/FirstBacScienceCourse";
+import FirstBacEconomicsCourse from "@/models/FirstBacEconomicsCourse";
+import FirstBacLettersCourse from "@/models/FirstBacLettersCourse";
+import SecondBacMathACourse from "@/models/SecondBacMathACourse";
+import SecondBacMathBCourse from "@/models/SecondBacMathBCourse";
+import SecondBacLettersCourse from "@/models/SecondBacLettersCourse";
+import SecondBacPhysicsChemistryLifeSciencesCourse from "@/models/SecondBacPhysicsChemistryLifeSciencesCourse";
+import SecondBacTechnicalCommonCourse from "@/models/SecondBacTechnicalCommonCourse";
+import SecondBacEconomicsCourse from "@/models/SecondBacEconomicsCourse";
+import CommonCoreCourse from "@/models/CommonCoreCourse";
+import CommonCoreLettersCourse from "@/models/CommonCoreLettersCourse";
+import CommonCoreScienceCourse from "@/models/CommonCoreScienceCourse";
+import CommonCoreTechnicalCourse from "@/models/CommonCoreTechnicalCourse";
 
 // Helper function to get the correct model based on level and grade
 const getModel = (level: string, grade: string) => {
   if (level === "college") {
     switch (grade) {
       case "1":
-        return First_Collegue_Course;
+        return FirstCollegeCourse;
       case "2":
-        return Second_Collegue_Course;
+        return SecondCollegeCourse;
       case "3":
-        return Third_Collegue_Course;
+        return ThirdCollegeCourse;
       default:
         return null;
     }
   } else if (level === "lycee") {
     switch (grade) {
       case "math":
-        return Secondary_Math_Lycee_Courses;
+        return FirstBacMathCourse;
       case "science":
-        return Secondary_Science_Lycee_Courses;
-      case "2bac_math":
-        return Secondary_2Bac_Lycee_Math_Courses;
-      case "2bac_eco":
-        return Secondary_2Bac_Lycee_Eco_Courses;
-      case "2bac_pc":
-        return Secondary_2Bac_Lycee_Pc_Courses;
+        return FirstBacScienceCourse;
+      case "economics":
+        return FirstBacEconomicsCourse;
+      case "letters":
+        return FirstBacLettersCourse;
+      case "2bac_math_a":
+        return SecondBacMathACourse;
+      case "2bac_math_b":
+        return SecondBacMathBCourse;
+      case "2bac_letters":
+        return SecondBacLettersCourse;
+      case "2bac_pcsvt":
+        return SecondBacPhysicsChemistryLifeSciencesCourse;
       case "2bac_tct":
-        return Secondary_2Bac_Lycee_Tct_Courses;
-      case "tct":
-        return Tct_Course;
+        return SecondBacTechnicalCommonCourse;
+      case "2bac_eco":
+        return SecondBacEconomicsCourse;
+      case "common_core":
+        return CommonCoreCourse;
+      case "common_core_letters":
+        return CommonCoreLettersCourse;
+      case "common_core_science":
+        return CommonCoreScienceCourse;
+      case "common_core_technical":
+        return CommonCoreTechnicalCourse;
       default:
         return null;
     }
@@ -53,10 +74,9 @@ const getModel = (level: string, grade: string) => {
 };
 
 // GET /api/courses/[id]
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function GET(request: NextRequest, context: any) {
+  const { params } = context;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -84,17 +104,16 @@ export async function GET(
 }
 
 // PUT /api/courses/[id]
-export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function PUT(request: Request, context: any) {
+  const { params } = context;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
+    const body = await request.json();
     const { title, description } = body;
 
     if (!title || !description) {
@@ -129,10 +148,9 @@ export async function PUT(
 }
 
 // DELETE /api/courses/[id]
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function DELETE(request: Request, context: any) {
+  const { params } = context;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -140,9 +158,38 @@ export async function DELETE(
     }
 
     await connectDB();
-    const course = await Course.findByIdAndDelete(params.id);
 
-    if (!course) {
+    // Try to delete from all possible collections
+    const collections = [
+      FirstCollegeCourse,
+      SecondCollegeCourse,
+      ThirdCollegeCourse,
+      FirstBacMathCourse,
+      FirstBacScienceCourse,
+      FirstBacEconomicsCourse,
+      FirstBacLettersCourse,
+      SecondBacMathACourse,
+      SecondBacMathBCourse,
+      SecondBacLettersCourse,
+      SecondBacPhysicsChemistryLifeSciencesCourse,
+      SecondBacTechnicalCommonCourse,
+      SecondBacEconomicsCourse,
+      CommonCoreCourse,
+      CommonCoreLettersCourse,
+      CommonCoreScienceCourse,
+      CommonCoreTechnicalCourse,
+    ];
+
+    let deleted = false;
+    for (const Model of collections) {
+      const result = await Model.findByIdAndDelete(params.id);
+      if (result) {
+        deleted = true;
+        break;
+      }
+    }
+
+    if (!deleted) {
       return NextResponse.json(
         { message: "Course not found" },
         { status: 404 }
@@ -159,10 +206,9 @@ export async function DELETE(
   }
 }
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function PATCH(request: Request, context: any) {
+  const { params } = context;
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -170,7 +216,7 @@ export async function PATCH(
     }
 
     const { id } = params;
-    const { courseLink, exerciseLink } = await req.json();
+    const { courseLink, exerciseLink } = await request.json();
 
     await connectDB();
 
@@ -180,9 +226,9 @@ export async function PATCH(
 
     // Search in college models
     const collegeModels = [
-      { model: First_Collegue_Course, level: "college", grade: "1" },
-      { model: Second_Collegue_Course, level: "college", grade: "2" },
-      { model: Third_Collegue_Course, level: "college", grade: "3" },
+      { model: FirstCollegeCourse, level: "college", grade: "1" },
+      { model: SecondCollegeCourse, level: "college", grade: "2" },
+      { model: ThirdCollegeCourse, level: "college", grade: "3" },
     ];
 
     for (const { model: collegeModel, level, grade } of collegeModels) {
@@ -197,33 +243,44 @@ export async function PATCH(
     // If not found in college models, search in lycee models
     if (!course) {
       const lyceeModels = [
-        { model: Secondary_Math_Lycee_Courses, level: "lycee", grade: "math" },
+        { model: FirstBacMathCourse, level: "lycee", grade: "math" },
+        { model: FirstBacScienceCourse, level: "lycee", grade: "science" },
+        { model: FirstBacEconomicsCourse, level: "lycee", grade: "economics" },
+        { model: FirstBacLettersCourse, level: "lycee", grade: "letters" },
+        { model: SecondBacMathACourse, level: "lycee", grade: "2bac_math_a" },
+        { model: SecondBacMathBCourse, level: "lycee", grade: "2bac_math_b" },
         {
-          model: Secondary_Science_Lycee_Courses,
+          model: SecondBacLettersCourse,
           level: "lycee",
-          grade: "science",
+          grade: "2bac_letters",
         },
         {
-          model: Secondary_2Bac_Lycee_Math_Courses,
+          model: SecondBacPhysicsChemistryLifeSciencesCourse,
           level: "lycee",
-          grade: "2bac_math",
+          grade: "2bac_pcsvt",
         },
         {
-          model: Secondary_2Bac_Lycee_Eco_Courses,
-          level: "lycee",
-          grade: "2bac_eco",
-        },
-        {
-          model: Secondary_2Bac_Lycee_Pc_Courses,
-          level: "lycee",
-          grade: "2bac_pc",
-        },
-        {
-          model: Secondary_2Bac_Lycee_Tct_Courses,
+          model: SecondBacTechnicalCommonCourse,
           level: "lycee",
           grade: "2bac_tct",
         },
-        { model: Tct_Course, level: "lycee", grade: "tct" },
+        { model: SecondBacEconomicsCourse, level: "lycee", grade: "2bac_eco" },
+        { model: CommonCoreCourse, level: "lycee", grade: "common_core" },
+        {
+          model: CommonCoreLettersCourse,
+          level: "lycee",
+          grade: "common_core_letters",
+        },
+        {
+          model: CommonCoreScienceCourse,
+          level: "lycee",
+          grade: "common_core_science",
+        },
+        {
+          model: CommonCoreTechnicalCourse,
+          level: "lycee",
+          grade: "common_core_technical",
+        },
       ];
 
       for (const { model: lyceeModel, level, grade } of lyceeModels) {
